@@ -1,13 +1,15 @@
 #!/usr/bin/env node
 'use strict';
+var spawn = require('child_process').spawn;
+var exec = require('child_process').exec;
 var fs = require('fs');
 var path = require('path');
+var os = require('os');
 var nopt = require('nopt');
 var chalk = require('chalk');
-var _ = require('lodash');
+var argv = require('optimist').argv;
 var pkg = require('../package.json');
 var updateNotifier = require('update-notifier');
-var sudoBlock = require('sudo-block');
 var Insight = require('insight');
 
 var opts = nopt({
@@ -19,7 +21,6 @@ var opts = nopt({
 });
 
 var args = opts.argv.remain;
-var cmd = args[0];
 
 var insight = new Insight({
   trackingCode: 'UA-43097923-1',
@@ -37,16 +38,72 @@ if (opts.insight === false) {
 var insightMsg = chalk.gray('\
 ==========================================================================') + chalk.yellow('\n\
 We\'re constantly looking for ways to make ') + chalk.bold.red(pkg.name) + chalk.yellow(' better! \n\
-May we anonymously report usage statistics to improve the tool over time? \n\
-') + chalk.gray('\n\
-==========================================================================');
+May we anonymously report usage statistics to improve the tool over time?') + chalk.gray('==========================================================================');
+
+var getCurrentVersion = function () {
+  return undefined;
+};
+
+var exit = function () {
+  console.log(chalk.red([].slice.call(arguments).join(' ')));
+  process.exit(-1);
+};
+
+var error = exit.bind(null, 'Error:');
+
+var success = function () {
+  console.log(chalk.green([].slice.call(arguments).join(' ')));
+};
+
+var msg = function () {
+  console.log(chalk.blue([].slice.call(arguments).join(' ')));
+};
+
+var done = function () {
+  success('Released new version ' + getCurrentVersion() + ' successfully.');
+  process.exit(0);
+};
+
+var getPkg = function () {
+  var pkg;
+  try {
+    pkg = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), './package.json')));
+  } catch(e) {
+    error(' Could not open and parse package.json.');
+  }
+  return pkg;
+};
+
+var init = function () {
+  var version = process.argv[2];
+  var oldVersion = getCurrentVersion();
+  var message = argv.m || argv.message;
+
+  if (!oldVersion) {
+    error('No version in package.json found.');
+  }
+  if (!version){
+    error('No version supplied.');
+  }
+
+  msg('Updating version...');
+
+  var npm = spawn('npm', ['version', version, '-m' message || "Release v%s."]);
+  npm.stdout.pipe(process.stdout);
+  npm.stderr.pipe(process.stderr);
+
+  npm.on('close', function (code) {
+    if (code !== 0) {
+      return error('Error with npm version. Exiting.');
+    }
+
+    success('Version bumped from', oldVersion, 'to', getCurrentVersion());
+    msg('Pushing...');
+  });
+};
 
 
-function init() {
-  
-}
-
-function pre() {
+var pre = function () {
   if (opts.version) {
     return console.log(pkg.version);
   }
@@ -68,8 +125,8 @@ function pre() {
     if (insight.optOut === undefined) {
       insight.optOut = insight.config.get('optOut');
       insight.track('downloaded');
-
-      insight.askPermission(insightMsg, init)
+      insight.track('platform', os.type(), os.release() );
+      insight.askPermission(insightMsg, init);
       return;
     }
 
@@ -77,6 +134,6 @@ function pre() {
   }
 
   init();
-}
+};
 
 pre();
