@@ -1,4 +1,4 @@
-# npm-publish [![Build Status](https://secure.travis-ci.org/danielchatfield/npm-publish.png?branch=master)](http://travis-ci.org/danielchatfield/npm-publish)
+# npm-publish [![Build Status](https://secure.travis-ci.org/danielchatfield/npm-publish.png?branch=master)](http://travis-ci.org/danielchatfield/npm-publish) [![Dependency Status](https://david-dm.org/danielchatfield/npm-publish.png)](https://david-dm.org/danielchatfield/npm-publish)
 
 A cross platform script to publish NPM modules. Based on `npm-release` but rewritten to add support for windows.
 
