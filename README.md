@@ -17,9 +17,8 @@ Install the module with: `npm install -g npm-publish`
 npm-publish [<newversion> | major | minor | patch]
 ```
 
-```shell
-npm-publish 1.0.2 # publishes version 1.0.2
-```
+`newversion` publishes the specified version
+Major, minor and patch increase a semver compatible version number. 
 
 
 ## License
