@@ -13,11 +13,11 @@ Install the module with: `npm install -g npm-publish`
 
 ## Usage
 
-`sh
+`shell
 npm-publish [<newversion> | major | minor | patch]
 `
 
-`sh
+`shell
 npm-publish 1.0.2 # publishes version 1.0.2
 `
 
