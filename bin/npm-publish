@@ -1,17 +1,16 @@
 #!/usr/bin/env node
 'use strict';
-var spawn = require('child_process').spawn;
-var exec = require('child_process').exec;
-var cmdify = require('cmdify');
-var fs = require('fs');
-var path = require('path');
-var os = require('os');
-var nopt = require('nopt');
 var chalk = require('chalk');
-var argv = require('optimist').argv;
-var pkg = require('../package.json');
-var updateNotifier = require('update-notifier');
 var Insight = require('insight');
+var nopt = require('nopt');
+var os = require('os');
+var pkg = require('../package.json');
+var cli = require('../lib/index.js');
+var updateNotifier = require('update-notifier');
+
+var run = function() {
+  cli.npmPublish(process.argv[2]);
+};
 
 var opts = nopt({
   help: Boolean,
@@ -35,107 +34,33 @@ if (opts.insight === false) {
   insight.config.set('optOut', false);
 }
 
-/*jshint multistr:true */
-var insightMsg = chalk.gray('\
-==========================================================================') + chalk.yellow('\n\
-We\'re constantly looking for ways to make ') + chalk.bold.red(pkg.name) + chalk.yellow(' better! \n\
-May we anonymously report usage statistics to improve the tool over time?') + chalk.gray('==========================================================================');
+if (opts.version) {
+  return console.log(pkg.version);
+}
 
-var exit = function () {
-  console.log(chalk.red([].slice.call(arguments).join(' ')));
-  process.exit(-1);
-};
-
-var error = exit.bind(null, 'Error:');
-
-var success = function () {
-  console.log(chalk.green([].slice.call(arguments).join(' ')));
-};
-
-var msg = function () {
-  console.log(chalk.blue([].slice.call(arguments).join(' ')));
-};
-
-var getPkg = function () {
-  var pkg;
-  try {
-    pkg = JSON.parse(fs.readFileSync(path.resolve(process.cwd(), './package.json')));
-  } catch(e) {
-    error(' Could not open and parse package.json.');
-  }
-  return pkg;
-};
-
-var getCurrentVersion = function () {
-  return getPkg().version;
-};
-
-var done = function () {
-  success('Released new version ' + getCurrentVersion() + ' successfully.');
-  process.exit(0);
-};
-
-
-var init = function () {
-  var version = process.argv[2];
-  var oldVersion = getCurrentVersion();
-  var message = argv.m || argv.message;
-
-  if (!oldVersion) {
-    error('No version in package.json found.');
-  }
-  if (!version){
-    error('No version supplied.');
-  }
-
-  msg('Updating version...');
-
-  var npm = spawn(cmdify('npm'), ['version', version, '-m', message || "Release v%s."]);
-  npm.stdout.pipe(process.stdout);
-  npm.stderr.pipe(process.stderr);
-
-  npm.on('close', function (code) {
-    if (code !== 0) {
-      return error('Error with npm version. Exiting.');
-    }
-
-    success('Version bumped from', oldVersion, 'to', getCurrentVersion());
-    msg('Pushing...');
+if (opts['update-notifier'] !== false) {
+  var notifier = updateNotifier({
+    packagePath: '../package'
   });
-};
 
-
-var pre = function () {
-  if (opts.version) {
-    return console.log(pkg.version);
-  }
-
-  if (opts['update-notifier'] !== false) {
-    var notifier = updateNotifier({
-      packagePath: '../package'
-    });
-
-    if (notifier.update) {
-      if( opts.insight !== false ) {
-        insight.track('notify-update');
-      }
-      notifier.notify(true);
+  if (notifier.update) {
+    if( opts.insight !== false ) {
+      insight.track('notify-update');
     }
+    notifier.notify(true);
+  }
+}
+
+if (opts.insight !== false) {
+  if (insight.optOut === undefined) {
+    insight.optOut = insight.config.get('optOut');
+    insight.track('downloaded');
+    insight.track('platform', os.type(), os.release() );
+    insight.askPermission(chalk.grey('Can we collect anonymous usage data?'), run);
+    return;
   }
 
-  if (opts.insight !== false) {
-    if (insight.optOut === undefined) {
-      insight.optOut = insight.config.get('optOut');
-      insight.track('downloaded');
-      insight.track('platform', os.type(), os.release() );
-      insight.askPermission(insightMsg, init);
-      return;
-    }
+  insight.track.apply(insight, args.slice(0, 2));
+}
 
-    insight.track.apply(insight, args.slice(0, 2));
-  }
-
-  init();
-};
-
-pre();
+run();

@@ -13,6 +13,7 @@
   "bin": {
     "npm-publish": "./bin/npm-publish"
   },
+  "main": "lib/index.js",
   "files": [
     "bin"
   ],
@@ -31,7 +32,8 @@
     "insight": "~0.1.0",
     "optimist": "~0.6.0",
     "chalk": "~0.1.0",
-    "cmdify": "~0.0.1"
+    "cmdify": "~0.0.1",
+    "async": "~0.2.9"
   },
   "devDependencies": {
     "grunt-contrib-jshint": "~0.6.0",
