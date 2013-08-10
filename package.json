@@ -1,0 +1,26 @@
+{
+  "name": "npm-publish",
+  "version": "1.0.0",
+  "description": "A cross platform script to publish NPM modules.",
+  "homepage": "https://github.com/danielchatfield/npm-publish/",
+  "bugs": "https://github.com/danielchatfield/npm-publish/issues",
+  "author": {
+    "name": "Daniel Chatfield",
+    "email": "chatfielddaniel@gmail.com",
+    "url": "www.danielchatfield.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/danielchatfield/npm-publish"
+  },
+  "licenses": [
+    {
+      "type": "MIT"
+    }
+  ],
+  "devDependencies": {
+    "grunt-contrib-jshint": "~0.6.0",
+    "grunt-contrib-nodeunit": "~0.2.0",
+    "grunt-contrib-watch": "~0.5.0"
+  }
+}
