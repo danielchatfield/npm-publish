@@ -1,6 +1,6 @@
 {
   "name": "npm-publish",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "A cross platform script to publish NPM modules.",
   "homepage": "https://github.com/danielchatfield/npm-publish/",
   "bugs": "https://github.com/danielchatfield/npm-publish/issues",
