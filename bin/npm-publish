@@ -40,10 +40,6 @@ var insightMsg = chalk.gray('\
 We\'re constantly looking for ways to make ') + chalk.bold.red(pkg.name) + chalk.yellow(' better! \n\
 May we anonymously report usage statistics to improve the tool over time?') + chalk.gray('==========================================================================');
 
-var getCurrentVersion = function () {
-  return undefined;
-};
-
 var exit = function () {
   console.log(chalk.red([].slice.call(arguments).join(' ')));
   process.exit(-1);
@@ -59,11 +55,6 @@ var msg = function () {
   console.log(chalk.blue([].slice.call(arguments).join(' ')));
 };
 
-var done = function () {
-  success('Released new version ' + getCurrentVersion() + ' successfully.');
-  process.exit(0);
-};
-
 var getPkg = function () {
   var pkg;
   try {
@@ -73,6 +64,16 @@ var getPkg = function () {
   }
   return pkg;
 };
+
+var getCurrentVersion = function () {
+  return getPkg().version;
+};
+
+var done = function () {
+  success('Released new version ' + getCurrentVersion() + ' successfully.');
+  process.exit(0);
+};
+
 
 var init = function () {
   var version = process.argv[2];
