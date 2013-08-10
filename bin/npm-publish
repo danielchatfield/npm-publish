@@ -1,0 +1,82 @@
+#!/usr/bin/env node
+'use strict';
+var fs = require('fs');
+var path = require('path');
+var nopt = require('nopt');
+var chalk = require('chalk');
+var _ = require('lodash');
+var pkg = require('../package.json');
+var updateNotifier = require('update-notifier');
+var sudoBlock = require('sudo-block');
+var Insight = require('insight');
+
+var opts = nopt({
+  help: Boolean,
+  version: Boolean
+}, {
+  h: '--help',
+  v: '--version'
+});
+
+var args = opts.argv.remain;
+var cmd = args[0];
+
+var insight = new Insight({
+  trackingCode: 'UA-43097923-1',
+  packageName: pkg.name,
+  packageVersion: pkg.version
+});
+
+if (opts.insight === false) {
+  insight.config.set('optOut', true);
+} else if (opts.insight) {
+  insight.config.set('optOut', false);
+}
+
+/*jshint multistr:true */
+var insightMsg = chalk.gray('\
+==========================================================================') + chalk.yellow('\n\
+We\'re constantly looking for ways to make ') + chalk.bold.red(pkg.name) + chalk.yellow(' better! \n\
+May we anonymously report usage statistics to improve the tool over time? \n\
+') + chalk.gray('\n\
+==========================================================================');
+
+
+function init() {
+  
+}
+
+function pre() {
+  if (opts.version) {
+    return console.log(pkg.version);
+  }
+
+  if (opts['update-notifier'] !== false) {
+    var notifier = updateNotifier({
+      packagePath: '../package'
+    });
+
+    if (notifier.update) {
+      if( opts.insight !== false ) {
+        insight.track('notify-update');
+      }
+      notifier.notify(true);
+    }
+  }
+
+  if (opts.insight !== false) {
+    if (insight.optOut === undefined) {
+      insight.optOut = insight.config.get('optOut');
+      insight.track('downloaded');
+
+      insight.askPermission(insightMsg, init)
+      return;
+    }
+
+    insight.track.apply(insight, args.slice(0, 2));
+  }
+
+  init();
+}
+
+pre();
