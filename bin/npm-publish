@@ -2,6 +2,7 @@
 'use strict';
 var spawn = require('child_process').spawn;
 var exec = require('child_process').exec;
+var cmdify = require('cmdify');
 var fs = require('fs');
 var path = require('path');
 var os = require('os');
@@ -89,7 +90,7 @@ var init = function () {
 
   msg('Updating version...');
 
-  var npm = spawn('npm', ['version', version, '-m', message || "Release v%s."]);
+  var npm = spawn(cmdify('npm'), ['version', version, '-m', message || "Release v%s."]);
   npm.stdout.pipe(process.stdout);
   npm.stderr.pipe(process.stderr);
 
