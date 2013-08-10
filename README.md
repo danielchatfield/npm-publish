@@ -5,7 +5,8 @@ A cross platform script to publish NPM modules. Based on `npm-release` but rewri
 ## What it does
 
  * Bumps version number in `package.json`
- * 
+ * Pushes to git
+ * Publishes to npm
 
 ## Installation
 Install the module with: `npm install -g npm-publish`
