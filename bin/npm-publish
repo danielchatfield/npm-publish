@@ -88,7 +88,7 @@ var init = function () {
 
   msg('Updating version...');
 
-  var npm = spawn('npm', ['version', version, '-m' message || "Release v%s."]);
+  var npm = spawn('npm', ['version', version, '-m', message || "Release v%s."]);
   npm.stdout.pipe(process.stdout);
   npm.stderr.pipe(process.stderr);
 
