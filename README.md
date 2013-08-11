@@ -14,11 +14,15 @@ Install the module with: `npm install -g npm-publish`
 ## Usage
 
 ```shell
-npm-publish [<newversion> | major | minor | patch]
+npm-publish [<newversion> | major | minor | patch] -m "message" -f "Force message"
 ```
 
 `newversion` publishes the specified version
-Major, minor and patch increase a semver compatible version number. 
+Major, minor and patch increase a semver compatible version number.
+
+Use the `-m` flag to customise the release commit message.
+
+Use the `-f` flag to stage and commit all changes before releasing with the specified message.
 
 
 ## License
