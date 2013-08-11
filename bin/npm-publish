@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 'use strict';
+var argv = require('optimist').argv;
 var chalk = require('chalk');
 var Insight = require('insight');
 var nopt = require('nopt');
@@ -9,7 +10,9 @@ var cli = require('../lib/index.js');
 var updateNotifier = require('update-notifier');
 
 var run = function() {
-  cli.npmPublish(process.argv[2]);
+  var message = argv.m || argv.message;
+  var force = argv.f || argv.force;
+  cli.npmPublish(process.argv[2], message, force);
 };
 
 var opts = nopt({
@@ -36,6 +39,10 @@ if (opts.insight === false) {
 
 if (opts.version) {
   return console.log(pkg.version);
+}
+
+if (opts.help) {
+  return console.log('Refer to http://github.com/danielchatfield/npm-publish/');
 }
 
 if (opts['update-notifier'] !== false) {
