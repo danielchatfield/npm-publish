@@ -3,14 +3,24 @@
 var argv = require('optimist').argv;
 var chalk = require('chalk');
 var nopt = require('nopt');
-var os = require('os');
 var pkg = require('../package.json');
 var cli = require('../lib/index.js');
 var updateNotifier = require('update-notifier');
 
+var help = function() {
+  var message = '        npm-publish [' + chalk.cyan('<newversion>') + ' | major | minor | patch] -m ' + chalk.cyan('"message"');
+  console.log(message);
+};
+
 var run = function() {
   var message = argv.m || argv.message;
   var force = argv.f || argv.force;
+  var version = argv._[0];
+
+  if(version === undefined) {
+    return help();
+  }
+
   cli.npmPublish(process.argv[2], message, force);
 };
 
@@ -22,12 +32,14 @@ var opts = nopt({
   v: '--version'
 });
 
-var args = opts.argv.remain;
+if (opts['update-notifier'] !== false) {
+  var notifier = updateNotifier({
+    packagePath: '../package'
+  });
 
-if (opts.insight === false) {
-  insight.config.set('optOut', true);
-} else if (opts.insight) {
-  insight.config.set('optOut', false);
+  if (notifier.update) {
+    notifier.notify(true);
+  }
 }
 
 if (opts.version) {
@@ -35,20 +47,9 @@ if (opts.version) {
 }
 
 if (opts.help) {
-  return console.log('Refer to http://github.com/danielchatfield/npm-publish/');
+  return help();
 }
 
-if (opts['update-notifier'] !== false) {
-  var notifier = updateNotifier({
-    packagePath: '../package'
-  });
 
-  if (notifier.update) {
-    if( opts.insight !== false ) {
-      insight.track('notify-update');
-    }
-    notifier.notify(true);
-  }
-}
 
 run();
