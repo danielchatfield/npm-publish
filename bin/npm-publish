@@ -2,7 +2,6 @@
 'use strict';
 var argv = require('optimist').argv;
 var chalk = require('chalk');
-var Insight = require('insight');
 var nopt = require('nopt');
 var os = require('os');
 var pkg = require('../package.json');
@@ -24,12 +23,6 @@ var opts = nopt({
 });
 
 var args = opts.argv.remain;
-
-var insight = new Insight({
-  trackingCode: 'UA-43097923-1',
-  packageName: pkg.name,
-  packageVersion: pkg.version
-});
 
 if (opts.insight === false) {
   insight.config.set('optOut', true);
@@ -56,18 +49,6 @@ if (opts['update-notifier'] !== false) {
     }
     notifier.notify(true);
   }
-}
-
-if (opts.insight !== false) {
-  if (insight.optOut === undefined) {
-    insight.optOut = insight.config.get('optOut');
-    insight.track('downloaded');
-    insight.track('platform', os.type(), os.release() );
-    insight.askPermission(chalk.grey('Can we collect anonymous usage data?'), run);
-    return;
-  }
-
-  insight.track.apply(insight, args.slice(0, 2));
 }
 
 run();
